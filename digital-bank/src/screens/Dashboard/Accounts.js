@@ -50,8 +50,8 @@ const PendingAccounts = () => {
 
   const handleStatusChange = (status, account_id) => {
     const fetch = async () => {
-      //const data = await update_account(account_id, {"status": status}, user.token);
-      //console.log(data);
+      const data = await update_account(account_id, {"status": status}, user.token);
+      console.log(data);
       fetchData(true);
     };
     fetch();
