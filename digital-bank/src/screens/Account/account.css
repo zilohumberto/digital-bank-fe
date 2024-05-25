@@ -1,0 +1,15 @@
+.movements-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .movements-table th, .movements-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .movements-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+  

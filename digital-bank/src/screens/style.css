@@ -1,0 +1,12 @@
+.error-message {
+    color: red;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .warning-message {
+    color: rgb(172, 172, 48);
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
