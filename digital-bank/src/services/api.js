@@ -4,7 +4,7 @@ const {REACT_APP_API_HOST}  = process.env;
 
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:5100',
+  baseURL: 'http://ec2-18-228-5-80.sa-east-1.compute.amazonaws.com',
 });
 
 
