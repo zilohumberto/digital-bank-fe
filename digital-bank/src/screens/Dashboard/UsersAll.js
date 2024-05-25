@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { get_users, update_user } from '../../services/users';
+import { get_users, update_user, delete_users } from '../../services/users';
 
 const AllUsers = () => {
   const [pending, setPending] = useState([]);
@@ -45,6 +45,16 @@ const AllUsers = () => {
     fetchData(false);
   }
 
+  const DeleteUsers = (id) => {
+    const fetch = async () => {
+      const data = await delete_users(id, user.token);
+      console.log(data);
+      fetchData(true);
+    };
+    fetch();
+    fetchData(true);
+  }
+
   return (
     <div>
       <table className="movements-table">
@@ -65,8 +75,9 @@ const AllUsers = () => {
                   <td>{row.email}</td>
                   <td>{row.status}</td>
                   <td>
-                    {row.status === 'created' && <button onClick={() => handleStatusChange("active", row.id)}>Activar</button>}
-                    {row.status !== 'blocked' && <button onClick={() => handleStatusChange("blocked", row.id)}>Bloquear</button>}
+                    {row.is_deleted === false && row.status === 'created' && <button onClick={() => handleStatusChange("active", row.id)}>Activar</button>}
+                    {row.is_deleted === false && row.status !== 'blocked' && <button onClick={() => handleStatusChange("blocked", row.id)}>Bloquear</button>}
+                    {row.is_deleted === false && <button onClick={() => DeleteUsers(row.id)}>Borrar</button>}
                   </td>
                 </tr>
               ))}

@@ -56,3 +56,19 @@ export const process_batch_users =  async (token) => {
       return {};
     }
 };
+
+
+export const delete_users =  async (id, token) => {
+  try {
+      const response = await api.delete(`/user/${id}`, { 
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Auth-Token': token, 
+          }
+        });
+    const is_success = response['data']['status'] === "success"; 
+    return is_success;
+  } catch (error) {
+    return false;
+  }
+};
