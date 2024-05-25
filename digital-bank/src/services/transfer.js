@@ -32,14 +32,15 @@ export const performTransaction = async (transactionData, token) => {
 };
 
 
-export const get_movements_admin =  async (operation_status, currency_name, token) => {
-  const response = await api.get(`/movements/?operation_status=${operation_status}&currency_name=${currency_name}`, { 
+export const get_movements_admin =  async (operation_status, currency_name, token, skip) => {
+  const response = await api.get(`/movements/?operation_status=${operation_status}&currency_name=${currency_name}&skip=${skip}`, { 
     headers: {
       'Content-Type': 'application/json',
       'X-Auth-Token': token, 
     }
   });
-  return response["data"];
+  console.log(response);
+  return response["data"]["data"];
 };
 
 export const process_batch_transactions =  async (token) => {

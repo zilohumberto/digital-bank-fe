@@ -1,5 +1,6 @@
 import React from 'react';
 import PendingUsers from './UsersWaitingForApproval';
+import AllUsers from './UsersAll';
 import PendingAccounts from './Accounts';
 import PendingTransactions from './Transactions';
 import './../Account/account.css';
@@ -7,15 +8,6 @@ import { useSelector } from 'react-redux';
 
 
 const DashboardScreen = () => {
-  const total_users = 0;
-  const total_accounts = 0;
-  const total_transactions = 0;
-  const total_fee_usd = 0;
-  const total_fee_eur = 0;
-  const total_fee_ars = 0;
-  const total_accounts_pending = 0;
-  const total_transactions_pending = 0;
-  
   const user = useSelector((state) => state.auth.user);
   const profile = user.profile;
   
@@ -36,6 +28,10 @@ const DashboardScreen = () => {
           <div style={styles.column}>
             <h2>Cuentas Pendientes de Aprobación</h2>
             <PendingAccounts/>
+          </div>
+          <div style={styles.column}>
+            <h2>Todos los usuarios</h2>
+              <AllUsers/>
           </div>
         </>
       )

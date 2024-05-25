@@ -4,19 +4,38 @@ import { get_accounts_by_status, update_account, process_batch_account } from '.
 
 const PendingAccounts = () => {
   const [pending, setPending] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, []);
 
-  const fetchData = () => {
+  const fetchData = (start) => {
     const fetch = async () => {
-      const data = await get_accounts_by_status('created', user.token);
-      setPending(data["data"]);
+      var oft = offset;
+      var p = pending;
+      if (start===true){
+        oft = 0;
+          p = [];
+      }
+      const response = await get_accounts_by_status('created', user.token, oft);
+      const data = response["data"];
+      if (data.length === 0 || data.length < 10){
+        setHasMorePages(false);
+      }
+      const new_pending = [...p, ...data];
+      setPending(new_pending);
+      setOffset(oft+10);
     };
     fetch();
   };
+
+  const nextPage = () => {
+    setOffset(offset+10);
+    fetchData(false);
+  }
 
   const handleApproveAll = () => {
     const fetch = async () => {
@@ -26,14 +45,14 @@ const PendingAccounts = () => {
     if (pending.length > 0){
       fetch();
     }
-    fetchData();
+    fetchData(true);
   };
 
   const handleStatusChange = (status, account_id) => {
     const fetch = async () => {
-      const data = await update_account(account_id, {"status": status}, user.token);
-      console.log(data);
-      fetchData();
+      //const data = await update_account(account_id, {"status": status}, user.token);
+      //console.log(data);
+      fetchData(true);
     };
     fetch();
   };
@@ -41,11 +60,10 @@ const PendingAccounts = () => {
   return (
     <div>
       <button onClick={handleApproveAll}>Procesar lote (10 por lote)</button>
-      <button onClick={fetchData}>Refrescar </button>
       <table className="movements-table">
             <thead>
               <tr>
-                <th>Creacion</th>
+                <th>Creación</th>
                 <th>Alias</th>
                 <th>Moneda</th>
                 <th>Estado</th>
@@ -67,6 +85,7 @@ const PendingAccounts = () => {
               ))}
             </tbody>
           </table>
+          {hasMorePages === true && <button onClick={() => nextPage()}>Cargar más...</button>}
     </div>
   );
 };

@@ -11,31 +11,49 @@ const PendingTransactions = () => {
   const [currencyName, setCurrencyName] = useState('EUR');
   const [selectedTab, setSelectedTab] = useState(0);
   const [currencies, setCurrencies] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
 
   useEffect(() => {
-    fetchMovements('EUR');
+    fetchMovements('EUR', true);
   }, []);
 
-  const fetchMovements = (cn) => {
-    const fetch = async (cn) => {
-      const data = await get_movements_admin('created', cn, user.token);
-      console.log(data['data'],cn ,selectedTab);
-      setPendingTransactions(data["data"]);
+  const fetchMovements = (cn, start) => {
+    const fetch = async () => {
+      var oft = offset;
+      var pen = pendingTransactions;
+      if (start === true){
+        oft = 0;
+        pen = [];
+      }
+      console.log("golsd");
+      const data = await get_movements_admin('created', cn, user.token, oft);
+      if (data.length === 0 || data.length < 10){
+          setHasMorePages(false);
+      }
+      const new_pending = [...pen, ...data];
+      setPendingTransactions(new_pending);
+      setOffset(oft+10);
 
       const _currencies = await getCurrencies(user.token);
       setCurrencies(_currencies);
       console.log(_currencies);
+
     };
-    fetch(cn);
+    fetch();
   };
 
 
   const handleTabChange = (event, newValue)  => {
     console.log(newValue, "new value ", currencies[newValue].name);
     setCurrencyName(currencies[newValue].name)
-
     setSelectedTab(newValue);
-    fetchMovements(currencies[newValue].name);
+    fetchMovements(currencies[newValue].name, true);
+  }
+
+  const nextPage = () => {
+    setOffset(offset+10);
+    fetchMovements(currencyName, false);
   }
 
   const handleApproveAll = () => {
@@ -46,12 +64,11 @@ const PendingTransactions = () => {
     if (pendingTransactions.length > 0){
       fetch();
     }
-    fetchMovements(currencyName);
+    fetchMovements(currencyName, true);
   };
   return (
     <div>
       <button onClick={handleApproveAll}>Procesar lote (10 por lote)</button>
-      <button onClick={fetchMovements}>Refrescar </button>
       <Box sx={{ width: '100%' }}>
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
       {currencies.map((currency) => (
@@ -62,7 +79,7 @@ const PendingTransactions = () => {
       <table className="movements-table">
             <thead>
               <tr>
-                <th>Creacion</th>
+                <th>Creación</th>
                 <th>Referencia</th>
                 <th>Tipo</th>
                 <th>Estado</th>
@@ -81,6 +98,7 @@ const PendingTransactions = () => {
               ))}
             </tbody>
           </table>
+          {hasMorePages === true && <button onClick={() => nextPage()}>Cargar más...</button>}
       </Box>
     </Box>
       

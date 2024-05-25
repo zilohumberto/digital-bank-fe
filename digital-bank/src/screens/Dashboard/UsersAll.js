@@ -1,46 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { get_users, update_user, process_batch_users } from '../../services/users';
+import { get_users, update_user } from '../../services/users';
 
-const PendingUsers = () => {
+const AllUsers = () => {
   const [pending, setPending] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, []);
 
-  const fetchData = () => {
+  const fetchData = (start) => {
     const fetch = async () => {
-      const data = await get_users('created', user.token, true, 0);
-      setPending(data);
+      var oft = offset;
+      var pen = pending;
+      if (start === true){
+          oft = 0;
+          pen = [];
+      }
+      const data = await get_users(null, user.token, false, oft);
+      if (data.length === 0 || data.length < 10){
+          setHasMorePages(false);
+      }
+      const new_pending = [...pen, ...data];
+      setPending(new_pending);
+      setOffset(oft+10);
     };
     fetch();
-  };
-
-  const handleApproveAll = () => {
-    const fetch = async () => {
-      const data = await process_batch_users(user.token);
-      console.log(data);
-    };
-    if (pending.length > 0){
-      fetch();
-    }
-    fetchData();
   };
 
   const handleStatusChange = (status, id) => {
     const fetch = async () => {
       const data = await update_user(id, {"status": status}, user.token);
       console.log(data);
-      fetchData();
+      fetchData(true);
     };
     fetch();
   };
 
+  const nextPage = () => {
+    setOffset(offset+10);
+    fetchData(false);
+  }
+
   return (
     <div>
-      <button onClick={handleApproveAll}>Procesar lote (10 por lote)</button>
       <table className="movements-table">
             <thead>
               <tr>
@@ -59,15 +65,16 @@ const PendingUsers = () => {
                   <td>{row.email}</td>
                   <td>{row.status}</td>
                   <td>
-                    <button onClick={() => handleStatusChange("active", row.id)}>Aprobar</button>
-                    <button onClick={() => handleStatusChange("blocked", row.id)}>Bloquear</button>
+                    {row.status === 'created' && <button onClick={() => handleStatusChange("active", row.id)}>Activar</button>}
+                    {row.status !== 'blocked' && <button onClick={() => handleStatusChange("blocked", row.id)}>Bloquear</button>}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {hasMorePages === true && <button onClick={() => nextPage()}>Cargar más...</button>}
     </div>
   );
 };
 
-export default PendingUsers;
+export default AllUsers;

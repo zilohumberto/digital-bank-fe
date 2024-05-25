@@ -1,8 +1,14 @@
 import api from './api';
 
 
-export const get_users = async (status, token) => {
-  const response = await api.get(`/user/?status=${status}`,{ 
+export const get_users = async (status, token, by_status, skip) => {
+  var url = '';
+  if (by_status===true){
+    url = `/user/?status=${status}&skip=${skip}`;
+  }else{
+    url = `/user/?skip=${skip}`;
+  }
+  const response = await api.get(url,{ 
     headers: {
       'Content-Type': 'application/json',
       'X-Auth-Token': token, 

@@ -58,9 +58,9 @@ export const get_accounts = (user_id, token) => async (dispatch) => {
   };
 
 
-  export const get_accounts_by_status =  async (status, token) => {
+  export const get_accounts_by_status =  async (status, token, skip) => {
     try {
-      const response = await api.get(`/account/?status=${status}`, { 
+      const response = await api.get(`/account/?status=${status}&skip=${skip}`, { 
         headers: {
           'Content-Type': 'application/json',
           'X-Auth-Token': token, 
