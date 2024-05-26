@@ -71,21 +71,29 @@ const TransactionScreen = () => {
       return;
     }
 
-
-    const is_success = await performTransaction({
-      "operation": transaction_type_new,
-      "user_id": user_id,
-      "origin_account_id":  selectedAccount.id,
-      "destination_account_id": new_target_account,
-      "amount": parseFloat(amount),
-      "reference": new_description,
-      "currency_name": selectedAccount.currency_name
-    }, user.token);
-    if (is_success){
-      navigate('/account/transaction/success');
+    const validated_amount = parseFloat(amount);
+    const total = selectedAccount.total;
+    console.log(total, validated_amount,);
+    if (validated_amount > 0 && validated_amount <= total){
+      const is_success = await performTransaction({
+        "operation": transaction_type_new,
+        "user_id": user_id,
+        "origin_account_id":  selectedAccount.id,
+        "destination_account_id": new_target_account,
+        "amount": validated_amount,
+        "reference": new_description,
+        "currency_name": selectedAccount.currency_name
+      }, user.token);
+      if (is_success){
+        navigate('/account/transaction/success');
+      }else{
+        setErrorMessage('No se pudo realizar la transaction. intente nuevamente');
+      }
     }else{
-      setErrorMessage('No se pudo realizar la transaction. intente nuevamente');
+      setErrorMessage('Verifique el monto.');
     }
+
+    
   };
 
   useEffect(() => {
